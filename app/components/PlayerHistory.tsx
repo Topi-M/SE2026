@@ -30,18 +30,65 @@ export default function PlayerHistory({
   return (
     <div className="mt-6 grid gap-4">
       {village.heroes.length > 0 && (
-        <section className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-          <h3 className="mb-3 text-lg font-bold text-white">Sankarit</h3>
-          <ul className="flex flex-wrap gap-2">
-            {village.heroes.map((hero) => (
-              <li
+        <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+          {village.heroes.map((hero) => {
+            const progress = (hero.level / hero.maxLevel) * 100;
+
+            return (
+              <article
                 key={hero.name}
-                className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-200"
+                className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
               >
-                {hero.name}: <span className="font-bold">{hero.level}</span> / {hero.maxLevel}
-              </li>
-            ))}
-          </ul>
+                {/* Otsikko ja taso */}
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h3 className="text-xl font-bold text-white">
+                    {hero.name}
+                  </h3>
+
+                  <span className="shrink-0 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm font-bold text-amber-400">
+                    Lvl {hero.level} / {hero.maxLevel}
+                  </span>
+                </div>
+
+                {/* Progress bar */}
+                <div className="h-3 overflow-hidden rounded-full border border-slate-800 bg-slate-950">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-amber-600 to-amber-400"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+
+                <p className="mt-2 text-right text-sm text-slate-400">
+                  {Math.round(progress)}% valmis
+                </p>
+
+                {/* Erotin */}
+                <div className="my-5 border-t border-slate-800" />
+
+                {/* Varusteet */}
+                <h4 className="mb-3 text-sm font-bold tracking-wide text-slate-500">
+                  KÄYTÖSSÄ OLEVAT VARUSTEET
+                </h4>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {hero.equipment?.map((equipment) => (
+                    <div
+                      key={equipment.name}
+                      className="rounded-xl border border-amber-600/70 bg-slate-950 p-3"
+                    >
+                      <p className="font-semibold text-slate-200">
+                        {equipment.name}
+                      </p>
+
+                      <p className="mt-1 text-sm font-bold text-amber-400">
+                        Taso {equipment.level}/{equipment.maxLevel} ★
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
         </section>
       )}
 

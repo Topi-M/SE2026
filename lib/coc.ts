@@ -20,6 +20,12 @@ export type PlayerLabel = {
 
 export type WarPreference = "in" | "out";
 
+export type HeroEquipment = {
+  name: string;
+  level: number;
+  maxLevel: number;
+};
+
 /** Frontille palautettava, karsittu näkymä kylän tiedoista. */
 export type Village = {
   tag: string;
@@ -52,7 +58,12 @@ export type Village = {
     badgeUrls: ImageUrls | null;
   } | null;
   labels: PlayerLabel[];
-  heroes: { name: string; level: number; maxLevel: number }[];
+  heroes: {
+    name: string;
+    level: number;
+    maxLevel: number;
+    equipment: HeroEquipment[];
+  }[];
 };
 
 /** Frontille palautettava, karsittu näkymä klaanin tiedoista. */
@@ -208,11 +219,30 @@ export async function getVillage(tag: string): Promise<Village> {
     ),
     heroes: (body.heroes ?? [])
       .filter((h: { village: string }) => h.village === "home")
-      .map((h: { name: string; level: number; maxLevel: number }) => ({
-        name: h.name,
-        level: h.level,
-        maxLevel: h.maxLevel,
-      })),
+      .map(
+        (h: {
+          name: string;
+          level: number;
+          maxLevel: number;
+          equipment?: {
+            name: string;
+            level: number;
+            maxLevel: number;
+            village?: string;
+          }[];
+        }) => ({
+          name: h.name,
+          level: h.level,
+          maxLevel: h.maxLevel,
+          equipment: (h.equipment ?? [])
+            .filter((e) => !e.village || e.village === "home")
+            .map((e) => ({
+              name: e.name,
+              level: e.level,
+              maxLevel: e.maxLevel,
+            })),
+        }),
+      ),
   };
 }
 
