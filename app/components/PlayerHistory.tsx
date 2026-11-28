@@ -30,7 +30,7 @@ export default function PlayerHistory({
   return (
     <div className="mt-6 grid gap-4">
       {village.heroes.length > 0 && (
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        <section className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
           <h3 className="mb-3 text-lg font-bold text-white">Sankarit</h3>
           <ul className="flex flex-wrap gap-2">
             {village.heroes.map((hero) => (
@@ -45,33 +45,36 @@ export default function PlayerHistory({
         </section>
       )}
 
-      {xpHistory && (
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-          <h3 className="mb-3 text-lg font-bold text-white">XP-historia</h3>
-          <XpHistoryChart history={xpHistory} />
-        </section>
-      )}
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+        {xpHistory && (
+          <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
+            <h3 className="mb-3 text-lg font-bold text-white">XP-historia</h3>
+            <XpHistoryChart history={xpHistory} />
+          </section>
+        )}
 
-      {heistHistory && (
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-          <h3 className="mb-3 text-lg font-bold text-white">Ryöstetty Dark Elixir</h3>
-          <HeistHistoryChart history={heistHistory} />
-        </section>
-      )}
+        {heistHistory && (
+          <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
+            <h3 className="mb-3 text-lg font-bold text-white">Ryöstetty Dark Elixir</h3>
+            <HeistHistoryChart history={heistHistory} />
+          </section>
+        )}
 
-      {warStarsHistory && (
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-          <h3 className="mb-3 text-lg font-bold text-white">Sotatähdet</h3>
-          <WarStarsHistoryChart history={warStarsHistory} />
-        </section>
-      )}
+        {warStarsHistory && (
+          <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
+            <h3 className="mb-3 text-lg font-bold text-white">Sotatähdet</h3>
+            <WarStarsHistoryChart history={warStarsHistory} />
+          </section>
+        )}
 
-      {leagueHistory && (
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-          <h3 className="mb-3 text-lg font-bold text-white">Liigahistoria</h3>
-          <LeagueHistoryChart data={leagueHistory} />
-        </section>
-      )}
+        {leagueHistory && (
+          <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
+            <h3 className="mb-3 text-lg font-bold text-white">Liigahistoria</h3>
+            <LeagueHistoryChart data={leagueHistory} />
+          </section>
+        )}
+      </div>
+
     </div>
   );
 }
@@ -184,6 +187,7 @@ function LeagueHistoryChart({ data }: { data: LeagueHistory }) {
       tickCount={6}
       marginLeft={84}
       marginRight={72}
+      stepLine
     />
   );
 }

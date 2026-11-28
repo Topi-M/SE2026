@@ -75,7 +75,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 sm:px-6 sm:py-10">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-7xl">
         <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-xl font-black tracking-tight text-white sm:text-2xl">
             Clash of Clans <span className="text-sky-400">Tracker</span>
