@@ -19,18 +19,19 @@ type Props = {
   tickCount?: number;
   marginLeft?: number;
   marginRight?: number;
+  stepLine?: boolean;
 };
 
-const W = 600;
-const H = 240;
-const TOP = 16;
-const BOTTOM = 28;
+const W = 720;
+const H = 320;
+const TOP = 24;
+const BOTTOM = 40;
 
-const SERIES = "#2a78d6";
-const GRID = "#e4e3df";
-const MUTED = "#52514e";
-const INK = "#0b0b0b";
-const SURFACE = "#ffffff";
+const SERIES = "#38bdf8";
+const GRID = "#334155";
+const MUTED = "#94a3b8";
+const INK = "#f8fafc";
+const SURFACE = "#0f172a";
 
 export const formatDate = (d: Date) =>
   d.toLocaleDateString("fi-FI", { day: "numeric", month: "numeric", year: "numeric" });
@@ -55,6 +56,7 @@ export default function HistoryChart({
   tickCount = 4,
   marginLeft = 40,
   marginRight = 44,
+  stepLine = false,
 }: Props) {
   const plotW = W - marginLeft - marginRight;
   const plotH = H - TOP - BOTTOM;
@@ -82,25 +84,46 @@ export default function HistoryChart({
   const xTicks =
     tMax === tMin ? [tMin] : [0, 1, 2, 3].map((i) => tMin + ((tMax - tMin) * i) / 3);
 
-  const path = pts.map((p, i) => `${i ? "L" : "M"}${x(p.t)},${y(p.value)}`).join(" ");
   const last = pts[pts.length - 1];
+  const path = pts
+    .map((point, index) => {
+      const pointX = x(point.t);
+      const pointY = y(point.value);
+      if (index === 0) return `M${pointX},${pointY}`;
+      return stepLine
+        ? `H${pointX} V${pointY}`
+        : `L${pointX},${pointY}`;
+    })
+    .join(" ");
+  const labelNearRightEdge = x(last.t) > W - marginRight - 72;
+  const valueLabelX = labelNearRightEdge ? x(last.t) - 8 : x(last.t) + 8;
+  const valueLabelAnchor = labelNearRightEdge ? "end" : "start";
 
   return (
     <svg
+      className="block h-auto w-full"
       viewBox={`0 0 ${W} ${H}`}
       width={W}
       height={H}
       role="img"
       aria-label={ariaLabel}
       fontFamily="sans-serif"
-      fontSize={12}
+      fontSize={14}
     >
       <rect width={W} height={H} fill={SURFACE} />
 
       {/* Vaakaruudukko ja Y-akselin arvot */}
       {yTicks.map((v) => (
         <g key={v}>
-          <line x1={marginLeft} x2={W - marginRight} y1={y(v)} y2={y(v)} stroke={GRID} strokeWidth={1} />
+          <line
+            x1={marginLeft}
+            x2={W - marginRight}
+            y1={y(v)}
+            y2={y(v)}
+            stroke={GRID}
+            strokeWidth={1}
+            strokeOpacity={0.75}
+          />
           <text x={marginLeft - 8} y={y(v)} textAnchor="end" dominantBaseline="middle" fill={MUTED}>
             {formatTick(v)}
           </text>
@@ -122,20 +145,36 @@ export default function HistoryChart({
         </text>
       ))}
 
-      <path d={path} fill="none" stroke={SERIES} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+      <path d={path} fill="none" stroke={SERIES} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" />
 
       {pts.map((p) => (
         <g key={p.t}>
-          <circle cx={x(p.t)} cy={y(p.value)} r={4} fill={SERIES} stroke={SURFACE} strokeWidth={2} />
+          <circle cx={x(p.t)} cy={y(p.value)} r={5} fill={SERIES} stroke={SURFACE} strokeWidth={2} />
           {/* Pistettä suurempi, näkymätön alue hover-vihjettä varten */}
-          <circle cx={x(p.t)} cy={y(p.value)} r={10} fill="transparent">
+          <circle cx={x(p.t)} cy={y(p.value)} r={13} fill="transparent">
             <title>{p.title}</title>
           </circle>
         </g>
       ))}
 
+      <circle
+        cx={x(last.t)}
+        cy={y(last.value)}
+        r={9}
+        fill="none"
+        stroke={SERIES}
+        strokeWidth={2.5}
+      />
+
       {/* Nykyinen arvo viivan päässä */}
-      <text x={x(last.t) + 8} y={y(last.value)} dominantBaseline="middle" fill={INK} fontWeight="bold">
+      <text
+        x={valueLabelX}
+        y={y(last.value)}
+        textAnchor={valueLabelAnchor}
+        dominantBaseline="middle"
+        fill={INK}
+        fontWeight="bold"
+      >
         {endLabel ?? formatTick(last.value)}
       </text>
     </svg>

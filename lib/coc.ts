@@ -5,6 +5,21 @@ export const LEAGUE_TIER_BASE_ID = 105000000;
 /** Legend League III:n id. Tätä suuremmat id:t ovat Legend-liigoja. */
 export const LEGEND_TIER_MIN_ID = 105000034;
 
+export type ImageUrls = {
+  small?: string;
+  tiny?: string;
+  medium?: string;
+  large?: string;
+};
+
+export type PlayerLabel = {
+  id: number;
+  name: string;
+  iconUrls: ImageUrls | null;
+};
+
+export type WarPreference = "in" | "out";
+
 /** Frontille palautettava, karsittu näkymä kylän tiedoista. */
 export type Village = {
   tag: string;
@@ -23,12 +38,20 @@ export type Village = {
   builderHallLevel: number | null;
   builderBaseTrophies: number | null;
   league: string | null;
+  leagueIconUrls: ImageUrls | null;
   leagueTierId: number | null;
   isLegend: boolean;
   /** Paras liiga nykyisen liigan ja tallennetun/API:n liigahistorian perusteella. */
   bestLeague: string | null;
+  warPreference: WarPreference | null;
   role: string | null;
-  clan: { tag: string; name: string; level: number } | null;
+  clan: {
+    tag: string;
+    name: string;
+    level: number;
+    badgeUrls: ImageUrls | null;
+  } | null;
+  labels: PlayerLabel[];
   heroes: { name: string; level: number; maxLevel: number }[];
 };
 
@@ -158,14 +181,31 @@ export async function getVillage(tag: string): Promise<Village> {
     builderHallLevel: body.builderHallLevel ?? null,
     builderBaseTrophies: body.builderBaseTrophies ?? null,
     league: body.leagueTier?.name ?? null,
+    leagueIconUrls: body.leagueTier?.iconUrls ?? body.league?.iconUrls ?? null,
     leagueTierId,
     isLegend: leagueTierId !== null && leagueTierId >= LEGEND_TIER_MIN_ID,
     // Reitti tarkentaa tämän historian perusteella (ks. app/api/player/[tag]/route.ts).
     bestLeague: body.leagueTier?.name ?? null,
+    warPreference:
+      body.warPreference === "in" || body.warPreference === "out"
+        ? body.warPreference
+        : null,
     role: body.role ?? null,
     clan: body.clan
-      ? { tag: body.clan.tag, name: body.clan.name, level: body.clan.clanLevel }
+      ? {
+          tag: body.clan.tag,
+          name: body.clan.name,
+          level: body.clan.clanLevel,
+          badgeUrls: body.clan.badgeUrls ?? null,
+        }
       : null,
+    labels: (body.labels ?? []).map(
+      (label: { id: number; name: string; iconUrls?: ImageUrls }) => ({
+        id: label.id,
+        name: label.name,
+        iconUrls: label.iconUrls ?? null,
+      }),
+    ),
     heroes: (body.heroes ?? [])
       .filter((h: { village: string }) => h.village === "home")
       .map((h: { name: string; level: number; maxLevel: number }) => ({
